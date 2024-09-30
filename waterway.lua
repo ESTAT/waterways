@@ -1,3 +1,5 @@
+Set = require('lib/set')
+Sequence = require('lib/sequence')
 -- Ramón Molinero Parejo <rmolinero@bilbomatica.es>
 -- Code adapted from train profile version (https://github.com/railnova/osrm-train-profile)
 -- Copyright 2017-2019 Railnova SA <support@railnova.eu>, Nikita Marchant <nikita.marchant@gmail.com>
@@ -5,6 +7,10 @@
 
 -- Define api version (required)
 api_version = 4
+
+-- Define avoidable values
+local avoidable_route_type = {"P_CANAL", "S_CANAL"}
+local avoidable_route = {"ferry"}
 
 -- Define setup function (required)
 function setup()
@@ -16,6 +22,16 @@ function setup()
       weight_name                    = 'duration',
       -- Must the route continue straight on at a via point, or are U-turns allowed? (default true)
       continue_straight_at_waypoint  = true,
+      -- Avoidable 'Route type' values
+      avoidable_route_type           = avoidable_route_type,
+      -- Avoidable 'Route' values
+      avoidable_route                = avoidable_route,
+      
+    },
+    
+    excludable = Sequence {
+        Set {'P_CANAL'},
+        Set {'S_CANAL'}
     },
     
 }
@@ -36,26 +52,12 @@ function process_way(profile, way, result, relations)
         -- Get OSM key tag to use
         cemt = way:get_value_by_key('CEMT'),
         maxspeed = way:get_value_by_key('maxspeed'),
+        routetype = way:get_value_by_key('Route_type'),
     }
+    
+    -- Check if the user wants to avoid canal routes
 
-    -- Remove everything that is not CEMT
-    if not data.cemt then
-        return
     -- Remove everything that is not a CEMT category between I to VII
-    elseif (
-        data.cemt ~= 'I' and
-        data.cemt ~= 'II' and
-        data.cemt ~= 'III' and
-        data.cemt ~= 'IV' and
-        data.cemt ~= 'Va' and
-        data.cemt ~= 'Vb' and
-        data.cemt ~= 'VIa' and
-        data.cemt ~= 'VIb' and
-        data.cemt ~= 'VIc' and
-        data.cemt ~= 'VII'
-    ) then
-        return
-    end
 
     -- default speed
     local default_speed = 20
