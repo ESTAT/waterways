@@ -8,8 +8,9 @@ Sequence = require('lib/sequence')
 -- Define api version (required)
 api_version = 4
 
+
 -- Define avoidable values
-local avoidable_route_type = {"P_CANAL", "S_CANAL"}
+local avoidable_route_type = {"PCANAL", "SCANAL"}
 local avoidable_route = {"ferry"}
 
 -- Define setup function (required)
@@ -18,7 +19,7 @@ function setup()
     properties = {
       -- Maximum vehicle speed to be assumed in matching (in m/s)
       max_speed_for_map_matching     = 20/3.6, -- 20 kmph -> m/s
-      -- Name used in output for the routing weight property (default 'duration')
+      -- Name used in output for the routing Sweight property (default 'duration')
       weight_name                    = 'duration',
       -- Must the route continue straight on at a via point, or are U-turns allowed? (default true)
       continue_straight_at_waypoint  = true,
@@ -29,9 +30,13 @@ function setup()
       
     },
     
+    classes = Sequence {
+        'PCANAL', 'SCANAL'
+    },
+    
     excludable = Sequence {
-        Set {'P_CANAL'},
-        Set {'S_CANAL'}
+        Set {'PCANAL'},
+        Set {'SCANAL'}
     },
     
 }
